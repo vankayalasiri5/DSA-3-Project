@@ -1,0 +1,176 @@
+<!DOCTYPE html><html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Delivery Route Optimizer</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#101827;--card:#172136;--bd:#26344d;--tx:#e5e7eb;--mu:#94a3b8;--g:#A3E635;--b:#38BDF8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme=light]{--bg:#eef2f7;--card:#fff;--bd:#d8e0ec;--tx:#0f172a;--mu:#64748b}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#101827}}
+*{box-sizing:border-box}html,body{height:100%;margin:0}body{font:14px Poppins,Inter,system-ui,sans-serif;background:var(--bg);color:var(--tx)}
+.app{display:grid;grid-template-columns:210px 1fr;min-height:100%}
+aside{background:var(--card);border-right:1px solid var(--bd);padding:14px 10px;position:sticky;top:0;height:100vh;overflow:auto}
+.logo{font-weight:700;color:var(--g);padding:6px 10px 14px}#nav button{display:flex;gap:10px;width:100%;background:none;border:0;color:var(--mu);padding:10px;border-radius:10px;cursor:pointer;font:inherit;text-align:left}
+#nav button.on,#nav button:hover{background:rgba(163,230,53,.12);color:var(--g)}
+.top{display:flex;gap:10px;align-items:center;padding:12px 20px;border-bottom:1px solid var(--bd);position:relative}.top b{flex:0 0 auto}
+input,select,textarea{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:9px 11px;font:inherit;max-width:100%}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--b)}
+#q{flex:1;max-width:320px;margin-left:auto}
+.ib{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;cursor:pointer;color:var(--tx)}
+#np{position:absolute;right:20px;top:56px;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;width:260px;z-index:9;box-shadow:0 10px 30px #0006}
+main{padding:20px;overflow:auto}h2{margin:0 0 14px}
+.card{background:linear-gradient(160deg,var(--card),rgba(23,33,54,.6));background-color:var(--card);border:1px solid var(--bd);border-radius:16px;padding:16px;box-shadow:0 8px 24px #0003;margin-bottom:16px}
+.hero{background:linear-gradient(120deg,#1e3a5f,#1a3b2c);border-radius:18px;padding:22px;margin-bottom:16px;color:#fff}.hero h1{margin:0 0 6px}.hero p{color:#cbd5e1;max-width:640px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}.cards .card{margin:0}.cards b{font-size:24px;display:block;color:var(--g)}.cards span{color:var(--mu)}
+.g2{display:grid;grid-template-columns:2fr 1fr;gap:16px}.g2b{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:860px){.app{grid-template-columns:1fr}aside{position:static;height:auto;display:flex;overflow:auto;padding:6px}#nav{display:flex}.logo{display:none}#nav button span{white-space:nowrap}.g2,.g2b{grid-template-columns:1fr}#q{display:none}}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.btn{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:9px 14px;cursor:pointer;font:inherit}.btn.p{background:var(--g);color:#14200a;border-color:var(--g);font-weight:600}.btn:hover{filter:brightness(1.12)}
+.map{width:100%;height:auto;max-height:460px;background:radial-gradient(circle at 30% 20%,rgba(56,189,248,.07),transparent 60%),var(--bg);border:1px solid var(--bd);border-radius:14px;touch-action:none;cursor:grab}
+.map .rd,.map .nd{cursor:pointer}.map text{fill:var(--tx);font-size:13px;font-family:Poppins,sans-serif;pointer-events:none}.map .lb{fill:var(--g);font-size:11px}
+table{width:100%;border-collapse:collapse}th,td{padding:7px 8px;border-bottom:1px solid var(--bd);text-align:left}th{color:var(--mu);font-weight:600}
+.err{color:#fca5a5;background:#7f1d1d33;padding:10px;border-radius:10px}.ok{color:var(--g)}.mu{color:var(--mu)}.tag{padding:2px 9px;border-radius:99px;font-size:12px;background:#38bdf822;color:var(--b)}
+.tag.Delivered{background:#a3e63522;color:var(--g)}.tag.Pending{background:#fbbf2422;color:#fbbf24}
+.bar{height:14px;border-radius:7px;background:var(--g);margin:3px 0}.bar.b{background:var(--b)}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--g);padding:10px 18px;border-radius:12px;z-index:20;display:none}
+.heap span{display:inline-block;background:#38bdf822;border:1px solid var(--b);border-radius:8px;padding:3px 8px;margin:2px}
+@media print{aside,.top,.btn,#toast{display:none}.app{display:block}}
+</style></head><body><div class="app"><aside><div class="logo">🚚 Route Optimizer</div><nav id="nav" aria-label="Main"></nav></aside>
+<div><div class="top"><b>Delivery Route Optimizer</b><input id="q" placeholder="Search location + Enter" list="dl" aria-label="Search locations"><button class="ib" id="bell" aria-label="Notifications">🔔</button><button class="ib" id="th" aria-label="Toggle theme">🌓</button><div id="np" hidden></div></div><main id="main"></main></div></div><datalist id="dl"></datalist><div id="toast" role="status"></div>
+<script>
+/* ---------- Data structures ---------- */
+class MinHeap{constructor(){this.a=[]}get size(){return this.a.length}
+push(k,v){const a=this.a;a.push([k,v]);let i=a.length-1;while(i>0){const p=(i-1)>>1;if(a[p][0]<=a[i][0])break;[a[p],a[i]]=[a[i],a[p]];i=p}}
+pop(){const a=this.a,top=a[0],last=a.pop();if(a.length){a[0]=last;let i=0;for(;;){let l=2*i+1,r=l+1,m=i;if(l<a.length&&a[l][0]<a[m][0])m=l;if(r<a.length&&a[r][0]<a[m][0])m=r;if(m==i)break;[a[m],a[i]]=[a[i],a[m]];i=m}}return top}}
+const LN=[['hub','Bachupally Hub',90,110],['pra','Pragathi Nagar',290,70],['niz','Nizampet',220,200],['miy','Miyapur',140,340],['kph','KPHB',400,240],['kuk','Kukatpally',540,110],['jnt','JNTU',430,400],['hit','HITEC City',650,350],['moo','Moosapet',730,120],['mad','Madhapur',810,250],['gac','Gachibowli',760,500],['lin','Lingampally',300,520]];
+const RD=[['hub','niz',3.2,9],['hub','pra',3.5,10],['pra','kuk',5.1,14],['niz','kph',4,12],['niz','miy',3.8,11],['hub','miy',5.5,15],['miy','lin',8.2,22],['miy','jnt',6.4,18],['kph','kuk',3.6,11],['kph','jnt',3.3,10],['kuk','moo',4.2,12],['jnt','hit',5,15],['kuk','hit',6.8,20],['moo','mad',6,17,1],['hit','mad',3.4,10],['hit','gac',4.5,13],['lin','gac',9.5,26],['lin','jnt',7,20]];
+const DV=[['ORD-101','Ravi Kumar','hub','mad','Anil','Delivered'],['ORD-102','Sneha Reddy','hub','gac','Suresh','In Transit'],['ORD-103','Farhan Ali','hub','miy','Anil','Pending'],['ORD-104','Lakshmi P','hub','kuk','Priya','Delivered'],['ORD-105','Karthik S','hub','lin','Suresh','Pending'],['ORD-106','Divya N','hub','jnt','Priya','In Transit']];
+const sample=()=>({locs:LN.map(([id,name,x,y])=>({id,name,x,y})),roads:RD.map(([a,b,d,t,ow],i)=>({id:'r'+(i+1),a,b,d,t,ow:!!ow})),deliv:DV.map(([id,cust,from,to,agent,st])=>({id,cust,from,to,agent,st})),hist:[],n:0,cfg:{fuel:8,theme:'dark',base:''}});
+function load(){try{const x=JSON.parse(localStorage.getItem('dro'));if(x&&x.locs&&x.roads)return{...sample(),...x}}catch(e){}return sample()}
+let S=load();const save=()=>{try{localStorage.setItem('dro',JSON.stringify(S))}catch(e){}};
+const $=(q,e=document)=>e.querySelector(q),$$=(q,e=document)=>[...e.querySelectorAll(q)];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const byId=id=>S.locs.find(l=>l.id==id),nm=id=>byId(id)?byId(id).name:id,f1=n=>(+n).toFixed(1);
+const idOf=v=>{v=(v||'').trim().toLowerCase();const l=S.locs.find(l=>l.name.toLowerCase()==v||l.id.toLowerCase()==v);return l&&l.id};
+function toast(m,bad){const t=$('#toast');t.textContent=m;t.style.borderColor=bad?'#f87171':'var(--g)';t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',2600)}
+/* ---------- Graph + Dijkstra ---------- */
+function buildAdj(){const adj={};S.locs.forEach(l=>adj[l.id]=[]);S.roads.forEach(r=>{if(!adj[r.a]||!adj[r.b])return;adj[r.a].push({to:r.b,d:r.d,t:r.t,id:r.id});if(!r.ow)adj[r.b].push({to:r.a,d:r.d,t:r.t,id:r.id})});return adj}
+function dijkstra(src,w,rec,ban){const adj=buildAdj(),dist={},prev={},vis=new Set(),H=new MinHeap(),steps=[];
+S.locs.forEach(l=>dist[l.id]=Infinity);if(!adj[src])return{dist,prev,steps};dist[src]=0;H.push(0,src);
+const snap=o=>{if(rec)steps.push({...o,dist:{...dist},prev:{...prev},heap:H.a.map(x=>[...x]),vis:[...vis]})};
+snap({cur:src,msg:`Initialise: distance to ${nm(src)} = 0, all others = ∞. Push (0, ${nm(src)}) into the min-heap.`});
+while(H.size){const[d,u]=H.pop();if(vis.has(u)||d>dist[u])continue;vis.add(u);
+snap({cur:u,msg:`Extract-min from heap: ${nm(u)} with distance ${f1(d)}. It is now finalised (visited).`});
+for(const e of adj[u]){if(ban&&ban.has(e.id)||vis.has(e.to))continue;const nd=d+e[w];const ok=nd<dist[e.to];
+const old=dist[e.to];if(ok){dist[e.to]=nd;prev[e.to]=u;H.push(nd,e.to)}
+snap({cur:u,edge:[u,e.to],msg:`Examine edge ${nm(u)} → ${nm(e.to)} (${f1(e[w])}). ${f1(d)} + ${f1(e[w])} = ${f1(nd)} ${ok?`< ${old===Infinity?'∞':f1(old)}, so relax: update distance, set predecessor = ${nm(u)}, push to heap.`:`≥ ${f1(old)}, no improvement.`}`})}}
+snap({msg:'Heap is empty — algorithm finished. Every reachable node has its final shortest distance; unreachable nodes stay at ∞.'});
+return{dist,prev,steps}}
+function pathOf(r,s,d){if(r.dist[d]===undefined||r.dist[d]===Infinity)return null;const p=[d];while(p[0]!=s){const q=r.prev[p[0]];if(q===undefined)return null;p.unshift(q)}return p}
+function routeInfo(path,w){const adj=buildAdj(),segs=[];for(let i=1;i<path.length;i++){const u=path[i-1],v=path[i];const e=adj[u].filter(x=>x.to==v).sort((a,b)=>a[w]-b[w])[0];segs.push({u,v,d:e.d,t:e.t,id:e.id})}
+const km=segs.reduce((a,s)=>a+s.d,0),min=segs.reduce((a,s)=>a+s.t,0);return{path,segs,km,min,tot:w=='d'?km:min}}
+function computeRoute(s,d,w){if(!byId(s)||!byId(d))return{err:'Choose valid locations from the list.'};if(s==d)return{err:'Source and destination are the same — distance is 0, nothing to route.'};
+const p=pathOf(dijkstra(s,w),s,d);if(!p)return{err:`No route exists from ${nm(s)} to ${nm(d)} (disconnected network or blocked by one-way roads).`};
+const info=routeInfo(p,w);let alt=null;info.segs.forEach(sg=>{const p2=pathOf(dijkstra(s,w,false,new Set([sg.id])),s,d);if(p2){const i2=routeInfo(p2,w);if(!alt||i2.tot<alt.tot)alt=i2}});
+return{s,d,w,...info,alt,fuel:info.km*S.cfg.fuel/100}}
+/* ---------- Map (SVG fallback; hosted pages block map tiles) ---------- */
+let VB=[0,0,900,600];
+function mapSVG(o={}){const hl=new Set();(o.paths||[]).forEach(p=>p&&p.forEach((v,i)=>i&&hl.add(p[i-1]+'>'+v)));const on=(a,b)=>hl.has(a+'>'+b)||hl.has(b+'>'+a);
+let s=`<svg class="map" viewBox="${VB.join(' ')}" role="img" aria-label="Road network map"><defs><pattern id="gr" width="45" height="45" patternUnits="userSpaceOnUse"><path d="M45 0H0V45" fill="none" stroke="#64748b" stroke-opacity=".15"/></pattern></defs><rect x="-2000" y="-2000" width="5000" height="5000" fill="url(#gr)"/>`;
+S.roads.forEach(r=>{const a=byId(r.a),b=byId(r.b);if(!a||!b)return;const g=on(r.a,r.b),c=o.edge&&((o.edge[0]==r.a&&o.edge[1]==r.b)||(o.edge[0]==r.b&&o.edge[1]==r.a));
+s+=`<line class="rd" data-r="${r.id}" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${c?'#FBBF24':g?'#A3E635':'#64748b'}" stroke-width="${g||c?6:3}" ${r.ow?'stroke-dasharray="9 6"':''} stroke-linecap="round"/>`;
+if(g||o.labels)s+=`<text class="lb" x="${(a.x+b.x)/2}" y="${(a.y+b.y)/2-6}" text-anchor="middle">${f1(r.d)} km</text>`});
+S.locs.forEach(l=>{const v=o.vis&&o.vis.includes(l.id),c=o.cur==l.id,inP=(o.paths||[]).some(p=>p&&p.includes(l.id));
+s+=`<circle class="nd" data-n="${l.id}" cx="${l.x}" cy="${l.y}" r="${c?15:11}" fill="${c?'#FBBF24':v?'#34D399':inP?'#A3E635':'#38BDF8'}" stroke="#fff" stroke-width="2"/><text x="${l.x}" y="${l.y-18}" text-anchor="middle">${esc(l.name)}</text>`;
+if(o.dist&&o.dist[l.id]!==undefined)s+=`<text class="lb" x="${l.x}" y="${l.y+28}" text-anchor="middle">${o.dist[l.id]===Infinity?'∞':f1(o.dist[l.id])}</text>`});
+return s+'</svg>'}
+function panzoom(svg){let d=null;svg.onpointerdown=e=>d=[e.clientX,e.clientY];svg.onpointermove=e=>{if(!d)return;const k=VB[2]/svg.clientWidth;VB[0]-=(e.clientX-d[0])*k;VB[1]-=(e.clientY-d[1])*k;d=[e.clientX,e.clientY];svg.setAttribute('viewBox',VB.join(' '))};svg.onpointerup=svg.onpointerleave=()=>d=null}
+function zoom(k){const[x,y,w,h]=VB,nw=w*k,nh=h*k;VB=[x+(w-nw)/2,y+(h-nh)/2,nw,nh];$('svg.map').setAttribute('viewBox',VB.join(' '))}
+function mapReset(){VB=[0,0,900,600];$('svg.map').setAttribute('viewBox',VB.join(' '))}
+function fit(){if(!R||R.err)return toast('Calculate a route first',1);const ps=R.path.map(byId),xs=ps.map(p=>p.x),ys=ps.map(p=>p.y),x0=Math.min(...xs)-80,y0=Math.min(...ys)-80,w=Math.max(...xs)-x0+80,h=Math.max(...ys)-y0+80,k=Math.max(w/900,h/600);VB=[x0,y0,900*k,600*k];$('svg.map').setAttribute('viewBox',VB.join(' '))}
+const mapCtl=()=>`<div class="row"><button class="btn" onclick="zoom(.75)" aria-label="Zoom in">＋</button><button class="btn" onclick="zoom(1.33)" aria-label="Zoom out">－</button><button class="btn" onclick="mapReset()">Reset</button><button class="btn" onclick="fit()">Fit to route</button><span class="mu">Drag to pan · click nodes/roads for details</span></div>`;
+document.addEventListener('click',e=>{const box=$('#info');if(!box)return;const n=e.target.closest('[data-n]'),r=e.target.closest('[data-r]');
+if(n){const l=byId(n.dataset.n),deg=buildAdj()[l.id].length;box.innerHTML=`<b>📍 ${esc(l.name)}</b><br><span class="mu">ID ${esc(l.id)} · ${deg} outgoing road(s)</span>`}
+else if(r){const x=S.roads.find(q=>q.id==r.dataset.r);box.innerHTML=`<b>🛣️ ${esc(nm(x.a))} ${x.ow?'→':'↔'} ${esc(nm(x.b))}</b><br>${f1(x.d)} km · ${f1(x.t)} min <span class="mu">(illustrative)</span>`}});
+/* ---------- Views ---------- */
+const NAV=[['dash','🏠','Dashboard'],['planner','🧭','Route Planner'],['map','🗺️','Map View'],['manage','📍','Locations & Roads'],['viz','🎬','DSA Visualizer'],['multi','📦','Multi-Stop'],['deliv','🚚','Deliveries'],['analytics','📊','Analytics'],['settings','⚙️','Settings']];
+let cur='dash',R=null,Q={w:'d'},MR=null,V=null;
+const opts=(sel)=>S.locs.map(l=>`<option value="${l.id}" ${sel==l.id?'selected':''}>${esc(l.name)}</option>`).join('');
+const card=(i,v,l)=>`<div class="card"><span>${i} ${l}</span><b>${v}</b></div>`;
+const summary=r=>!r?'<p class="mu">No route calculated yet.</p>':r.err?`<div class="err">${esc(r.err)}</div>`:`<h3 class="ok" style="margin-top:0">${esc(nm(r.s))} → ${esc(nm(r.d))}</h3><p><b>${f1(r.km)} km</b> · <b>${f1(r.min)} min</b> · ⛽ ${f1(r.fuel)} L</p><p class="mu">${r.path.map(p=>esc(nm(p))).join(' → ')}</p>`;
+const segTable=r=>`<table><tr><th>#</th><th>Road</th><th>km</th><th>min</th></tr>${r.segs.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(nm(s.u))} → ${esc(nm(s.v))}</td><td>${f1(s.d)}</td><td>${f1(s.t)}</td></tr>`).join('')}<tr><th></th><th>Total</th><th>${f1(r.km)}</th><th>${f1(r.min)}</th></tr></table>`;
+const PG={
+dash(){if(!R)R=computeRoute('hub','gac','d');const tot=S.hist.reduce((a,h)=>a+h.km,0);
+return`<div class="hero"><h1>Welcome back 👋</h1><p>Road network modelled as a weighted graph: intersections are vertices, roads are weighted edges. Dijkstra with a binary min-heap finds shortest routes. Sample distances are <b>illustrative</b>, not verified navigation data.</p><div class="row"><button class="btn p" onclick="go('planner')">Plan a route</button><button class="btn" onclick="go('viz')">Watch Dijkstra</button><button class="btn" onclick="go('multi')">Multi-stop</button></div></div>
+<div class="cards">${card('📍',S.locs.length,'Locations')}${card('🛣️',S.roads.length,'Roads')}${card('🧭',S.n||0,'Routes calculated')}${card('📏',f1(tot)+' km','Distance planned')}${card('🚚',S.deliv.length,'Deliveries')}</div>
+<div class="g2"><div class="card"><h3 style="margin-top:0">Network map</h3>${mapSVG({paths:R&&R.path?[R.path]:[]})}${mapCtl()}<div id="info" class="mu">Click a marker or road.</div></div>
+<div><div class="card"><h3 style="margin-top:0">Current route</h3>${summary(R)}</div><div class="card"><h3 style="margin-top:0">Recent routes</h3>${S.hist.slice(0,5).map(h=>`<p>${esc(nm(h.s))} → ${esc(nm(h.d))} <span class="tag">${f1(h.km)} km</span></p>`).join('')||'<p class="mu">None yet.</p>'}</div>
+<div class="card"><h3 style="margin-top:0">Delivery activity</h3>${S.deliv.slice(0,4).map(d=>`<p>${d.id} → ${esc(nm(d.to))} <span class="tag ${d.st.split(' ')[0]}">${d.st}</span></p>`).join('')}<p class="mu">Status is simulated.</p></div></div></div>`},
+planner(){const r=R;return`<h2>Route Planner</h2><div class="g2b"><div class="card"><label>Source hub<br><input id="src" list="dl" value="${esc(Q.s?nm(Q.s):'')}" placeholder="Type to search"></label><br><br><label>Destination<br><input id="dst" list="dl" value="${esc(Q.d?nm(Q.d):'')}" placeholder="Type to search"></label>
+<div class="row"><label><input type="radio" name="w" value="d" ${Q.w!='t'?'checked':''}> Shortest distance</label><label><input type="radio" name="w" value="t" ${Q.w=='t'?'checked':''}> Estimated time</label></div>
+<div class="row"><button class="btn p" onclick="calc()">Calculate Route</button><button class="btn" onclick="R=null;render()">Clear</button><button class="btn" onclick="R=null;Q={w:'d'};render()">Reset</button></div><p class="mu">Fuel assumption: ${S.cfg.fuel} L/100 km (change in Settings). Dijkstra optimises one source→destination path for the chosen weight only.</p></div>
+<div class="card">${summary(r)}${r&&!r.err?segTable(r)+(r.alt?`<p>🔀 <b>Alternative</b> (best route avoiding one road of the shortest path): ${f1(r.alt.km)} km · ${f1(r.alt.min)} min — <span class="ok">${f1(r.alt.tot-r.tot)} ${r.w=='d'?'km':'min'} longer</span><br><span class="mu">${r.alt.path.map(p=>esc(nm(p))).join(' → ')}</span></p>`:'<p class="mu">No alternative route exists.</p>'):''}</div></div>
+<div class="card">${mapSVG({paths:r&&r.path?[r.path]:[]})}</div>`},
+map(){if(!R)R=computeRoute('hub','gac','d');return`<h2>Map View</h2><div class="g2"><div class="card">${mapSVG({paths:R&&R.path?[R.path]:[],labels:1})}${mapCtl()}<p class="mu">Built-in SVG map. Leaflet/OpenStreetMap tiles are not loaded because this hosted page only allows a fixed set of script hosts; positions are schematic.</p></div><div><div class="card"><h3 style="margin-top:0">Route summary</h3>${summary(R)}</div><div class="card" id="info">Click a marker or road for details.</div></div></div>`},
+manage(){return`<h2>Locations & Roads</h2><div class="g2b"><div class="card"><h3 style="margin-top:0">Add location</h3><div class="row"><input id="lid" placeholder="ID (optional)" size="8"><input id="lnm" placeholder="Name"><input id="lx" type="number" placeholder="x 0-900" style="width:100px"><input id="ly" type="number" placeholder="y 0-600" style="width:100px"><button class="btn p" onclick="addLoc()">Add</button></div>
+<table><tr><th>ID</th><th>Name</th><th></th></tr>${S.locs.map(l=>`<tr><td>${esc(l.id)}</td><td>${esc(l.name)}</td><td><button class="btn" onclick="editLoc('${l.id}')">Edit</button> <button class="btn" onclick="delLoc('${l.id}')">Delete</button></td></tr>`).join('')}</table></div>
+<div class="card"><h3 style="margin-top:0">Add road</h3><div class="row"><select id="ra" aria-label="From">${opts()}</select><select id="rb" aria-label="To">${opts()}</select><input id="rd" type="number" min="0" step="0.1" placeholder="km" style="width:80px"><input id="rt" type="number" min="0" step="0.1" placeholder="min" style="width:80px"><label><input id="ro" type="checkbox"> one-way</label><button class="btn p" onclick="addRoad()">Add</button></div>
+<div style="max-height:380px;overflow:auto"><table><tr><th>Road</th><th>km</th><th>min</th><th></th></tr>${S.roads.map(r=>`<tr><td>${esc(nm(r.a))} ${r.ow?'→':'↔'} ${esc(nm(r.b))}</td><td>${f1(r.d)}</td><td>${f1(r.t)}</td><td><button class="btn" onclick="editRoad('${r.id}')">Edit</button> <button class="btn" onclick="delRoad('${r.id}')">✕</button></td></tr>`).join('')}</table></div></div></div><button class="btn" onclick="if(confirm('Reset all data to sample?')){S=sample();save();render();toast('Sample data restored')}">Reset to Sample Data</button> <span class="mu">Sample values are illustrative.</span>`},
+viz(){return`<h2>Dijkstra Visualizer</h2><div class="card"><div class="row"><select id="vs" aria-label="Source">${opts(V&&V.s||'hub')}</select><select id="vd" aria-label="Destination">${opts(V&&V.d||'gac')}</select><select id="vw"><option value="d">distance</option><option value="t" ${V&&V.w=='t'?'selected':''}>time</option></select><button class="btn p" onclick="vzInit()">Load</button><button class="btn" id="vp" onclick="vzPlay()">▶ Play</button><button class="btn" onclick="vzGo(-1)">◀ Prev</button><button class="btn" onclick="vzGo(1)">Next ▶</button><button class="btn" onclick="vzInit()">Reset</button><label>Speed <input id="vsp" type="range" min="100" max="2000" value="1000"></label></div>
+<div class="g2"><div><div id="vmap"></div><p id="vmsg" class="ok"></p></div><div><b>Priority queue (binary min-heap array)</b><div id="vheap" class="heap"></div><div id="vtbl" style="margin-top:8px"></div></div></div></div>
+<div class="card"><b>Complexity:</b> O((V+E) log V) with an adjacency list and a binary min-heap (lazy deletion: stale heap entries are skipped, heap holds ≤ E entries so each push/pop is O(log E)=O(log V)). Space O(V+E). Requires non-negative edge weights (zero allowed). This animation replays the snapshots recorded by the real <code>dijkstra()</code> function.</div>`},
+multi(){return`<h2>Multi-Destination Delivery</h2><div class="g2b"><div class="card"><label>Start hub <select id="ms">${opts('hub')}</select></label><p>Select stops:</p><div id="stops">${S.locs.map(l=>`<label style="display:inline-block;margin:3px 8px 3px 0"><input type="checkbox" value="${l.id}"> ${esc(l.name)}</label>`).join('')}</div><div class="row"><select id="mw"><option value="d">by distance</option><option value="t">by time</option></select><label><input type="checkbox" id="mr"> return to hub</label><button class="btn p" onclick="multi()">Plan stops</button></div>
+<p class="mu">⚠ Heuristic: <b>nearest-neighbour</b> ordering using Dijkstra shortest paths between stops. It is fast but <b>not guaranteed optimal</b>; the exact problem (TSP / vehicle routing) is NP-hard and separate from Dijkstra.</p></div><div class="card" id="mres"><p class="mu">Choose stops and press Plan.</p></div></div><div class="card">${mapSVG({paths:MR?MR.paths:[]})}</div>`},
+deliv(){const q=(Q.dq||'').toLowerCase(),f=Q.df||'All';const L=S.deliv.filter(d=>(f=='All'||d.st==f)&&(d.id+d.cust+d.agent+nm(d.to)).toLowerCase().includes(q));
+return`<h2>Delivery Management</h2><p class="mu">Order data, statuses and tracking are <b>simulated</b> — no live GPS integration.</p><div class="card"><div class="row"><input id="dq" placeholder="Search orders" value="${esc(Q.dq||'')}" oninput="Q.dq=this.value;render(1)"><select onchange="Q.df=this.value;render()">${['All','Pending','In Transit','Delivered'].map(x=>`<option ${x==f?'selected':''}>${x}</option>`).join('')}</select></div>
+<table><tr><th>Order</th><th>Customer</th><th>From</th><th>To</th><th>Agent</th><th>Status</th></tr>${L.map(d=>`<tr><td>${d.id}</td><td>${esc(d.cust)}</td><td>${esc(nm(d.from))}</td><td>${esc(nm(d.to))}</td><td>${esc(d.agent)}</td><td><button class="btn tag ${d.st.split(' ')[0]}" onclick="adv('${d.id}')" title="Click to advance status">${d.st} ↻</button></td></tr>`).join('')||'<tr><td colspan=6>No orders match.</td></tr>'}</table></div>
+<div class="card"><b>New order</b><div class="row"><input id="nc" placeholder="Customer"><select id="nf">${opts('hub')}</select><select id="nt">${opts()}</select><input id="na" placeholder="Agent"><button class="btn p" onclick="addOrd()">Add</button></div></div>`},
+analytics(){const D=S.deliv.map(d=>{const r=computeRoute(d.from,d.to,'d');return{id:d.id,km:r.err?0:r.km,min:r.err?0:r.min,st:d.st}}),tk=D.reduce((a,d)=>a+d.km,0),mx=Math.max(1,...D.map(d=>d.km)),mt=Math.max(1,...D.map(d=>d.min)),base=+S.cfg.base,rk=R&&!R.err?R.km:null;
+return`<h2>Analytics</h2><p class="mu">Values are computed from illustrative sample distances. Fuel = km × ${S.cfg.fuel} L/100 km (assumption). No live traffic or measured fuel data.</p><div class="cards">${card('📏',f1(tk)+' km','Total distance')}${card('Ø',f1(tk/(D.length||1))+' km','Average route')}${card('⛽',f1(tk*S.cfg.fuel/100)+' L','Est. fuel (simulated)')}${card('✅',S.deliv.filter(d=>d.st=='Delivered').length,'Completed')}</div>
+<div class="g2b"><div class="card"><b>Distance per delivery (km)</b>${D.map(d=>`<div>${d.id} · ${f1(d.km)}<div class="bar" style="width:${d.km/mx*100}%"></div></div>`).join('')}</div><div class="card"><b>Estimated time per delivery (min)</b>${D.map(d=>`<div>${d.id} · ${f1(d.min)}<div class="bar b" style="width:${d.min/mt*100}%"></div></div>`).join('')}</div></div>
+<div class="card"><b>Baseline vs optimised (last calculated route)</b><div class="row"><input id="bs" type="number" min="0" step="0.1" placeholder="Your baseline route km" value="${S.cfg.base}"><button class="btn p" onclick="S.cfg.base=$('#bs').value;save();render()">Compare</button></div>${rk!==null&&base>0?`<p>Baseline <b>${f1(base)} km</b> vs optimised <b>${f1(rk)} km</b> → <span class="ok">${base>=rk?f1((base-rk)/base*100)+'% shorter':f1((rk-base)/base*100)+'% longer than your baseline'}</span> <span class="mu">(baseline is user-provided)</span></p>`:'<p class="mu">Calculate a route and enter a baseline km to compare.</p>'}</div>`},
+settings(){return`<h2>Reports & Settings</h2><div class="g2b"><div class="card"><div class="row"><label>Fuel consumption (L/100 km) <input id="fu" type="number" min="0.1" step="0.1" value="${S.cfg.fuel}"></label><button class="btn p" onclick="const v=+$('#fu').value;if(!(v>0))return toast('Enter a positive number',1);S.cfg.fuel=v;save();toast('Saved')">Save</button></div><div class="row"><button class="btn" onclick="th()">Toggle theme</button><button class="btn" onclick="if(confirm('Clear all saved data?')){S=sample();save();R=null;render();toast('Reset done')}">Reset data</button></div>
+<b>Route report</b><div class="row"><button class="btn" onclick="rep()">Generate CSV</button><button class="btn" onclick="dl()">Download</button><button class="btn" onclick="try{navigator.clipboard.writeText($('#csv').value);toast('Copied')}catch(e){$('#csv').select()}">Copy</button><button class="btn" onclick="window.print()">Print / PDF</button></div><textarea id="csv" rows="7" style="width:100%" readonly placeholder="Calculate a route, then Generate CSV"></textarea><p class="mu">Download works when the file is opened locally; in a hosted preview use Copy.</p></div>
+<div class="card"><h3 style="margin-top:0">Project information</h3><p><b>Delivery Route Optimizer Using Dijkstra's Algorithm and Priority Queue</b><br>Course: Data Structures and Algorithms-3 (25CS2103E)<br>Team 10: Bathula Neha (2520090013), Siri Chandana (2520090198)<br>Guide: Mrs. Ch. Anitha, Assistant Professor, CS&amp;IT</p><p class="mu">Graph: adjacency list. Priority queue: binary min-heap. Dijkstra finds the shortest path from one source to all reachable nodes for non-negative weights; predecessors reconstruct the path. Data lives in your browser's LocalStorage.</p></div></div>`}};
+const AF={viz(){vzInit()}};
+/* ---------- Actions ---------- */
+function calc(){Q={s:idOf($('#src').value),d:idOf($('#dst').value),w:$('input[name=w]:checked').value};R=computeRoute(Q.s,Q.d,Q.w);
+if(!R.err){S.n=(S.n||0)+1;S.hist.unshift({s:R.s,d:R.d,km:R.km,min:R.min});S.hist=S.hist.slice(0,30);save()}render()}
+function addLoc(){let id=$('#lid').value.trim()||('L'+Date.now().toString(36).slice(-4)),n=$('#lnm').value.trim(),x=+$('#lx').value,y=+$('#ly').value;
+if(!n)return toast('Name required',1);if(byId(id)||S.locs.some(l=>l.name.toLowerCase()==n.toLowerCase()))return toast('ID and name must be unique',1);
+if($('#lx').value===''||$('#ly').value===''||x<0||y<0||x>900||y>600)return toast('x must be 0–900, y 0–600',1);S.locs.push({id,name:n,x,y});save();render();toast('Location added')}
+function editLoc(id){const l=byId(id),n=(prompt('New name',l.name)||'').trim();if(!n)return;if(S.locs.some(o=>o.id!=id&&o.name.toLowerCase()==n.toLowerCase()))return toast('Name already used',1);l.name=n;save();render()}
+function delLoc(id){if(S.deliv.some(d=>d.from==id||d.to==id))return toast('Location used by a delivery order',1);if(!confirm('Delete location and its roads?'))return;S.locs=S.locs.filter(l=>l.id!=id);S.roads=S.roads.filter(r=>r.a!=id&&r.b!=id);R=null;save();render()}
+function addRoad(){const a=$('#ra').value,b=$('#rb').value,d=parseFloat($('#rd').value),t=parseFloat($('#rt').value);
+if(!a||!b||a==b)return toast('Pick two different locations',1);if(isNaN(d)||isNaN(t)||d<0||t<0)return toast('Distance and time must be numbers ≥ 0',1);
+if(S.roads.some(r=>(r.a==a&&r.b==b)||(r.a==b&&r.b==a)))return toast('A road between these locations already exists',1);
+S.roads.push({id:'r'+Date.now(),a,b,d,t,ow:$('#ro').checked});R=null;save();render();toast('Road added')}
+function editRoad(id){const r=S.roads.find(x=>x.id==id),d=parseFloat(prompt('Distance km',r.d)),t=parseFloat(prompt('Time min',r.t));if(isNaN(d)||isNaN(t)||d<0||t<0)return toast('Invalid values (must be ≥ 0)',1);r.d=d;r.t=t;R=null;save();render()}
+function delRoad(id){S.roads=S.roads.filter(r=>r.id!=id);R=null;save();render()}
+function multi(){const s=$('#ms').value,w=$('#mw').value;let todo=$$('#stops input:checked').map(i=>i.value).filter(x=>x!=s);if(!todo.length)return toast('Select at least one stop (other than the hub)',1);
+let at=s,order=[],paths=[],km=0,min=0,skipped=[];
+while(todo.length){const r=dijkstra(at,w);let best=null;todo.forEach(t=>{if(r.dist[t]<Infinity&&(!best||r.dist[t]<r.dist[best]))best=t});
+if(!best){skipped.push(...todo);break}const p=pathOf(r,at,best),i=routeInfo(p,w);order.push(best);paths.push(p);km+=i.km;min+=i.min;todo=todo.filter(x=>x!=best);at=best}
+if($('#mr').checked&&at!=s){const p=pathOf(dijkstra(at,w),at,s);if(p){const i=routeInfo(p,w);paths.push(p);km+=i.km;min+=i.min}else toast('No way back to the hub',1)}
+MR={paths};render();$('#mres').innerHTML=`<h3 class="ok" style="margin-top:0">Sequence (nearest-neighbour heuristic)</h3><p>${[s,...order].map(x=>esc(nm(x))).join(' → ')}${$('#mr')&&0?'':''}</p><p><b>${f1(km)} km</b> · <b>${f1(min)} min</b> · ⛽ ${f1(km*S.cfg.fuel/100)} L</p>${skipped.length?`<div class="err">Unreachable stops: ${skipped.map(x=>esc(nm(x))).join(', ')}</div>`:''}<p class="mu">Not guaranteed optimal — exact multi-stop optimisation is a vehicle-routing problem.</p>`}
+function adv(id){const d=S.deliv.find(x=>x.id==id),o=['Pending','In Transit','Delivered'];d.st=o[(o.indexOf(d.st)+1)%3];save();render()}
+function addOrd(){const c=$('#nc').value.trim(),a=$('#na').value.trim();if(!c||!a)return toast('Customer and agent required',1);if($('#nf').value==$('#nt').value)return toast('Source and destination must differ',1);
+S.deliv.push({id:'ORD-'+(101+S.deliv.length+Math.floor(Math.random()*50)),cust:c,from:$('#nf').value,to:$('#nt').value,agent:a,st:'Pending'});save();render()}
+function rep(){if(!R||R.err)return toast('Calculate a route first',1);$('#csv').value=['From,To,Distance_km,Time_min',...R.segs.map(s=>`"${nm(s.u)}","${nm(s.v)}",${f1(s.d)},${f1(s.t)}`),`TOTAL,,${f1(R.km)},${f1(R.min)}`,`Fuel_L (assumed ${S.cfg.fuel}/100km),,${f1(R.fuel)},`,'Note,Illustrative sample data'].join('\n')}
+function dl(){rep();const v=$('#csv').value;if(!v)return;try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([v],{type:'text/csv'}));a.download='route_report.csv';a.click()}catch(e){toast('Use Copy instead',1)}}
+/* visualizer */
+function vzInit(){clearInterval(V&&V.t);const s=$('#vs')?$('#vs').value:'hub',d=$('#vd')?$('#vd').value:'gac',w=$('#vw')?$('#vw').value:'d';V={s,d,w,r:dijkstra(s,w,true),i:0,t:null};vz()}
+function vz(){const st=V.r.steps[V.i],last=V.i==V.r.steps.length-1,p=last?pathOf(V.r,V.s,V.d):null;
+$('#vmap').innerHTML=mapSVG({paths:p?[p]:[],vis:st.vis,cur:st.cur,edge:st.edge,dist:st.dist});
+$('#vmsg').textContent=`Step ${V.i+1}/${V.r.steps.length}: ${st.msg}${p?` Shortest path to ${nm(V.d)}: ${p.map(nm).join(' → ')}.`:''}`;
+$('#vheap').innerHTML=st.heap.map(([k,v])=>`<span>${f1(k)}, ${esc(nm(v))}</span>`).join('')||'<span class="mu">empty</span>';
+$('#vtbl').innerHTML=`<table><tr><th>Node</th><th>Dist</th><th>Prev</th><th>State</th></tr>${S.locs.map(l=>`<tr><td>${esc(l.name)}</td><td>${st.dist[l.id]===Infinity?'∞':f1(st.dist[l.id])}</td><td>${st.prev[l.id]?esc(nm(st.prev[l.id])):'–'}</td><td>${l.id==st.cur?'▶ current':st.vis.includes(l.id)?'✓ visited':'·'}</td></tr>`).join('')}</table>`}
+function vzGo(k){if(!V)return;V.i=Math.max(0,Math.min(V.r.steps.length-1,V.i+k));vz()}
+function vzPlay(){if(V.t){clearInterval(V.t);V.t=null;$('#vp').textContent='▶ Play';return}$('#vp').textContent='⏸ Pause';const tick=()=>{if(V.i>=V.r.steps.length-1){V.t=null;$('#vp').textContent='▶ Play';return}vzGo(1);V.t=setTimeout(tick,2100-$('#vsp').value)};V.t=setTimeout(tick,300)}
+/* shell */
+function go(v){if(V)clearTimeout(V.t),clearInterval(V.t);cur=v;VB=[0,0,900,600];render()}
+function render(keep){const a=document.activeElement&&document.activeElement.id;$('#nav').innerHTML=NAV.map(([k,i,n])=>`<button class="${k==cur?'on':''}" onclick="go('${k}')">${i}<span>${n}</span></button>`).join('');
+$('#main').innerHTML=PG[cur]();const s=$('svg.map');if(s&&cur!='viz')panzoom(s);if(AF[cur])AF[cur]();$('#dl').innerHTML=S.locs.map(l=>`<option value="${esc(l.name)}">`).join('');document.documentElement.dataset.theme=S.cfg.theme;
+if(keep&&a&&$('#'+a)){$('#'+a).focus();const e=$('#'+a);e.setSelectionRange&&e.setSelectionRange(e.value.length,e.value.length)}}
+function th(){S.cfg.theme=S.cfg.theme=='dark'?'light':'dark';save();render()}
+$('#th').onclick=th;$('#bell').onclick=()=>{const n=$('#np');n.hidden=!n.hidden;n.innerHTML='<b>Notifications</b>'+(S.deliv.filter(d=>d.st=='In Transit').map(d=>`<p>🚚 ${d.id} in transit (simulated)</p>`).join('')||'<p class="mu">Nothing new.</p>')};
+$('#q').onkeydown=e=>{if(e.key=='Enter'){const id=idOf(e.target.value);if(!id)return toast('Location not found',1);go('map');$('#info').innerHTML=`<b>📍 ${esc(nm(id))}</b>`}};
+render();
+</script></body></html>
